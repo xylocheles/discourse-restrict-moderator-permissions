@@ -1,0 +1,5 @@
+plugins:
+  restrict_moderator_permissions_enabled:
+    default: true
+  restrict_moderator_permissions_cannot_access_staff_logs:
+    default: false
