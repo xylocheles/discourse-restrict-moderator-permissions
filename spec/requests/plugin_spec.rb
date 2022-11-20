@@ -23,6 +23,15 @@ RSpec.describe "Restrict Moderator Permissions" do
       get '/admin/logs/staff_action_logs.json'
       expect(response.status).to eq(200)
     end
+
+    it 'allows admins to export staff action logs' do
+      SiteSetting.restrict_moderator_permissions_cannot_access_staff_logs=true
+
+      expect {
+        post '/export_csv/export_entity.json', params: {entity: 'staff_action'}
+      }.to have_enqueued_job
+      expect(response.status).to eq(200)
+    end
   end
 
   context 'while logged in as a moderator' do
@@ -36,6 +45,15 @@ RSpec.describe "Restrict Moderator Permissions" do
       SiteSetting.restrict_moderator_permissions_cannot_access_staff_logs=true
 
       get '/admin/logs/staff_action_logs.json'
+      expect(response.status).not_to eq(200)
+    end
+
+    it 'forbids moderators to export staff action logs' do
+      SiteSetting.restrict_moderator_permissions_cannot_access_staff_logs=true
+
+      expect {
+        post '/export_csv/export_entity.json', params: {entity: 'staff_action'}
+      }.not_to have_enqueued_job
       expect(response.status).not_to eq(200)
     end
   end
